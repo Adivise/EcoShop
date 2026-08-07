@@ -24,20 +24,15 @@ dependencies {
     }
 }
 
-java {
-    withJavadocJar()
-}
-
 publishing {
     publications {
-        // maven-private: only the shaded jar
+        // maven-private: the libreforge jar (shaded plugin with libreforge embedded)
         create<MavenPublication>("private") {
             artifactId = rootProject.name
         }
-        // maven-releases + GitHub: full set (none, all, sources, javadoc)
+        // maven-releases (served publicly via the maven-public group): the shaded jar
         create<MavenPublication>("release") {
             artifactId = rootProject.name
-            from(components["shadow"])
         }
     }
     repositories {
@@ -49,6 +44,8 @@ publishing {
                 password = System.getenv("MAVEN_PASSWORD")
             }
         }
+        // maven-public is a group repo and rejects uploads (405) - deploy to the
+        // hosted maven-releases repo, which the group serves.
         maven {
             name = "AuxilorReleases"
             url = uri("https://repo.auxilor.io/repository/maven-releases/")
@@ -60,9 +57,16 @@ publishing {
     }
 }
 
+// Neither publication is attached to a software component, so only the single jar
+// and its pom are published - no sources, javadoc, or classified variants.
 afterEvaluate {
     publishing.publications.named<MavenPublication>("private") {
         artifact(tasks.named("libreforgeJar"))
+    }
+    publishing.publications.named<MavenPublication>("release") {
+        artifact(tasks.named("shadowJar")) {
+            classifier = ""
+        }
     }
 }
 
@@ -98,7 +102,6 @@ allprojects {
     }
 
     java {
-        withSourcesJar()
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 
