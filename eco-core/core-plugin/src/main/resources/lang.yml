@@ -57,6 +57,30 @@ messages:
   invalid-category: "&cInvalid category: %category%"
   must-specify-category: "&cYou must specify a category!"
 
+  sellwand:
+    invalid: "&cThis sell wand no longer exists!"
+    no-access: "&cYou can't use a sell wand on this container!"
+    no-permission: "&cYou don't have permission to use sell wands!"
+    missing-requirements: "&cYou can't use this sell wand here!"
+    no-uses: "&cThis sell wand is out of uses!"
+    on-cooldown: "&cWait &e%time%s&c before using this again!"
+    period-limit: "&cYou've used this wand too many times recently! Resets in &e%time%&c."
+    nothing-sold: "&cNothing in this container could be sold!"
+    sold: "&fSold &a%amount%&f items for &a%price%&f! &7(%uses% uses left)"
+    given: "&fGave &a%amount%x %wand%&f to &a%player%&f!"
+    invalid-wand: "&cInvalid sell wand!"
+    inspect: "&fThis would sell &a%amount%&f items for &a%price%&f. &7(%unsold% stacks can't be sold; boosters not included)"
+
+  sellchest:
+    limit-reached: "&cYou've placed the maximum of &e%limit%&c sell chests!"
+    not-owner: "&cThis sell chest belongs to &e%owner%&c!"
+    sold: "&fSell chest sold &a%amount%&f items for &a%price%"
+    offline-summary: "&fWhile you were away, your sell chests earned &a%price%&f for &a%amount%&f items."
+    given: "&fGave &a%amount%x %type%&f to &a%player%&f!"
+    invalid-type: "&cInvalid sell chest type!"
+    count: "&a%player%&f has &a%count%&f/&a%limit%&f sell chests."
+    count-set: "&fSet &a%player%&f's sell chest count to &a%count%&f."
+
 rotation-countdown: "%hours%h %minutes%m %seconds%s"
 rotation-ready: "Rotating soon..."
 

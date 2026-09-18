@@ -8,10 +8,20 @@ import com.willfp.ecoshop.commands.CommandSell
 import com.willfp.ecoshop.integrations.EcoShopAdapter
 import com.willfp.ecoshop.libreforge.EffectBuyItem
 import com.willfp.ecoshop.libreforge.EffectOpenShop
+import com.willfp.ecoshop.libreforge.EffectSellContainer
 import com.willfp.ecoshop.libreforge.FilterShopItem
 import com.willfp.ecoshop.libreforge.TriggerBuyItem
 import com.willfp.ecoshop.libreforge.TriggerSellItem
+import com.willfp.ecoshop.libreforge.TriggerUseSellWand
 import com.willfp.ecoshop.logging.ShopLogListener
+import com.willfp.ecoshop.sellchest.SellChestHolograms
+import com.willfp.ecoshop.sellchest.SellChestIndex
+import com.willfp.ecoshop.sellchest.SellChestListener
+import com.willfp.ecoshop.sellchest.SellChestTask
+import com.willfp.ecoshop.sellchest.SellChestTypes
+import com.willfp.ecoshop.sellwand.SellWandListener
+import com.willfp.ecoshop.sellwand.SellWands
+import com.willfp.ecoshop.sellwand.WandInspector
 import com.willfp.ecoshop.shop.DynamicPricingDecayTask
 import com.willfp.ecoshop.shop.ShopCategories
 import com.willfp.ecoshop.shop.ShopItems
@@ -38,6 +48,8 @@ class EcoShopPlugin : LibreforgePlugin() {
 
     override fun loadConfigCategories(): List<ConfigCategory> {
         return listOf(
+            SellWands,
+            SellChestTypes,
             ShopCategories,
             Shops
         )
@@ -49,11 +61,17 @@ class EcoShopPlugin : LibreforgePlugin() {
         Filters.register(FilterShopItem)
         Triggers.register(TriggerBuyItem)
         Triggers.register(TriggerSellItem)
+        Triggers.register(TriggerUseSellWand)
         Effects.register(EffectBuyItem)
         Effects.register(EffectOpenShop)
+        Effects.register(EffectSellContainer)
     }
 
     override fun handleReload() {
+        SellWands.values().forEach { it.loadFilter() }
+        SellChestTypes.values().forEach { it.loadFilter() }
+        WandInspector.clear()
+
         SellGUI.update()
 
         decayTask?.cancel()
@@ -62,14 +80,21 @@ class EcoShopPlugin : LibreforgePlugin() {
         }
 
         registerPlaceholders(this)
+
+        SellChestIndex.rescanLoaded()
+        SellChestIndex.markAllDirty()
+        SellChestTask.start()
     }
 
     override fun handleDisable() {
+        SellChestTask.stop()
+        SellChestHolograms.clear()
+        WandInspector.clear()
         ShopCategories.values().forEach { it.stopRotation() }
     }
 
     override fun loadListeners(): List<Listener> {
-        return listOf(ShopLogListener)
+        return listOf(ShopLogListener, SellWandListener, SellChestListener)
     }
 
     override fun loadPluginCommands(): List<PluginCommand> {

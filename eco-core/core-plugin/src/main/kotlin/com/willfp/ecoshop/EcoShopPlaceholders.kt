@@ -2,6 +2,9 @@ package com.willfp.ecoshop
 
 import com.willfp.eco.core.placeholder.PlayerPlaceholder
 import com.willfp.eco.core.placeholder.PlayerlessPlaceholder
+import com.willfp.ecoshop.sellchest.SellChestLimits
+import com.willfp.ecoshop.sellwand.SellWands
+import com.willfp.ecoshop.sellwand.WandSeller
 import com.willfp.ecoshop.shop.BuyType
 import com.willfp.ecoshop.shop.ShopCategories
 import com.willfp.ecoshop.shop.ShopItem
@@ -9,6 +12,20 @@ import com.willfp.ecoshop.shop.rotation.RotationPlaceholders
 
 fun registerPlaceholders(plugin: EcoShopPlugin) {
     RotationPlaceholders.register()
+
+    for (wand in SellWands.values()) {
+        PlayerPlaceholder(plugin, "sellwand_${wand.id}_period_uses") { player ->
+            WandSeller.limiter.periodUses(player, wand.limits).toString()
+        }.register()
+    }
+
+    PlayerPlaceholder(plugin, "sellchest_count") { player ->
+        SellChestLimits.count(player).toString()
+    }.register()
+
+    PlayerPlaceholder(plugin, "sellchest_limit") { player ->
+        SellChestLimits.limitFor(player).let { if (it < 0) "∞" else it.toString() }
+    }.register()
 
     for (category in ShopCategories.values()) {
         for (item in category.items) {
